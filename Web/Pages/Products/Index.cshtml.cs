@@ -1,24 +1,18 @@
+using Application.Features.Products.Models;
+using Infrastructure.HttpClient;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Web.Pages.Products;
 
 public class IndexModel : PageModel
 {
-    public List<dynamic> Products { get; set; } = new List<dynamic>();  
+    private readonly IProductAPI _productAPI;
 
-    public void OnGet()
-    {
-        for (int i = 0; i < 5; i++)
-        {
-            Products.Add(new {
-              ProductId = i + 1,
-              ProductNumber = Guid.NewGuid(),
-              Name = $"Item_{i + 1}",
-              ProductCategory = new {
-                    Name = "Mobile"
-              },
-              Price = new Random().Next(),
-            });
-        }
-    }
+    public IndexModel(IProductAPI productAPI) => _productAPI = productAPI;
+
+    public IEnumerable<ProductResponseDTO> Products { get; set; } = Enumerable.Empty<ProductResponseDTO>();
+
+    public async Task OnGetAsync() => await GetProducts();
+
+    private async Task GetProducts() => Products = await _productAPI.GetProducts();
 }
