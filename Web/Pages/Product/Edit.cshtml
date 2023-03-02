@@ -1,0 +1,103 @@
+﻿@page "{id:int}"
+@model Web.Pages.Product.EditModel;
+
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<form method="post" enctype="multipart/form-data">
+    <input asp-for="EditProductViewModel!.Rowguid">
+    <input asp-for="EditProductViewModel!.ProductId">
+    <input asp-for="EditProductViewModel!.ThumbNailPhoto">
+
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+        <h1 class="h2">@ViewData["Title"]</h1>
+        <div class="btn-toolbar">
+            <button type="submit" class="btn btn-primary">
+                Edit product
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label asp-for="EditProductViewModel!.Name" class="form-label"></label>
+            <input asp-for="EditProductViewModel!.Name" class="form-control">
+            <span asp-validation-for="EditProductViewModel!.Name" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="EditProductViewModel!.ProductNumber" class="form-label"></label>
+            <input asp-for="EditProductViewModel!.ProductNumber" class="form-control">
+            <span asp-validation-for="EditProductViewModel!.ProductNumber" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="EditProductViewModel!.CategoryId" class="form-label"></label>
+            <select asp-for="EditProductViewModel!.CategoryId" asp-items="Model.SelectListProductCategories" class="form-select"> </select>
+            <span asp-validation-for="EditProductViewModel!.CategoryId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="EditProductViewModel!.Price" class="form-label"></label>
+            <input asp-for="EditProductViewModel!.Price" class="form-control">
+            <span asp-validation-for="EditProductViewModel!.Price" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="EditProductViewModel!.Color" class="form-label"></label>
+            <input asp-for="EditProductViewModel!.Color" type="color" class="form-control form-control-color w-100">
+            <span asp-validation-for="EditProductViewModel!.Color" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="EditProductViewModel!.Size" class="form-label"></label>
+            <select asp-for="EditProductViewModel!.Size" class="form-select">
+                <option value="">Choose...</option>
+                <option value="1">One</option>
+                <option value="2">Two</option>
+                <option value="3">Three</option>
+            </select>
+            <span asp-validation-for="EditProductViewModel!.Size" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="EditProductViewModel!.Weight" class="form-label"></label>
+            <input asp-for="EditProductViewModel!.Weight" class="form-control">
+            <span asp-validation-for="EditProductViewModel!.Weight" class="text-danger"></span>
+        </div>
+
+        <div class="col-6">
+            <label asp-for="EditProductViewModel!.UploadFile" class="form-label"></label>
+            <input id="upload_file" asp-for="EditProductViewModel!.UploadFile" class="form-control" accept="image/*">
+            <span id="upload_file_validation" asp-validation-for="EditProductViewModel!.UploadFile" class="text-danger"></span>
+        </div>
+
+        <div class="col-12">
+            @{
+                var image = "/images/no_image.jpg";
+                var classImageWidth = "w-50";
+                if (Model.EditProductViewModel.ThumbNailPhoto != null)
+                {
+                    image = $"data:image/jpeg;base64,{Convert.ToBase64String(Model.EditProductViewModel.ThumbNailPhoto)}";
+                    classImageWidth = "w-100";
+                }
+            }
+            <img id="preview_image" src="@image" class="@classImageWidth border">
+            <video id="video_player" controls class="w-100 d-none">
+                <source id="preview_video">
+            </video>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        $("#upload_file").change(function () {
+            previewFile(this);
+            $("#upload_file_validation").removeClass("field-validation-error").html("")
+        });
+    </script>
+}

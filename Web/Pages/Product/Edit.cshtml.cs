@@ -1,5 +1,6 @@
 using Application.Commom.Interfaces;
 using Application.Features.Products.Models;
+using Infrastructure.HttpClient;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,24 +11,24 @@ using Web.ViewModels;
 
 namespace Web.Pages.Product;
 
-public class CreateModel : PageModel
+public class EditModel : PageModel
 {
     [BindProperty]
-    public CreateProductViewModel CreateProductViewModel { get; set; } = new CreateProductViewModel();
+    public EditProductViewModel EditProductViewModel { get; set; } = new EditProductViewModel();
     public IEnumerable<SelectListItem>? SelectListProductCategories { get; set; }
 
     private readonly IProductAPI _productAPI;
     private readonly IProductCategoryAPI _productCategoryAPI;
 
-    public CreateModel(IProductAPI productAPI, IProductCategoryAPI productCategoryAPI)
+    public EditModel(IProductAPI productAPI, IProductCategoryAPI productCategoryAPI)
     {
         _productAPI = productAPI;
         _productCategoryAPI = productCategoryAPI;
     }
 
-    public async Task OnGetAsync() => await SetupSelectListProductCategoriesAsync();
+    public async Task OnGetAsync(int id) => await SetupWidgets(id);
 
-    public async Task<IActionResult> OnPostAsync()
+    public async Task<IActionResult> OnPostAsync(int id)
     {
         try
         {
@@ -40,27 +41,34 @@ public class CreateModel : PageModel
                 throw new Exception(errorMessages);
             }
 
-            IFormFile? uploadfile = CreateProductViewModel.UploadFile;
+            if (EditProductViewModel.ProductId != id)
+            {
+                throw new Exception("Product invalid");
+            }
+
+            IFormFile? uploadfile = EditProductViewModel.UploadFile;
 
             if (uploadfile == null)
             {
-                var createProductDTO = CreateProductViewModel.Adapt<CreateProductDTO>();
-                await _productAPI.AddProduct(createProductDTO);
+                var EditProductDTO = EditProductViewModel.Adapt<EditProductDTO>();
+                await _productAPI.EditProduct(id, EditProductDTO);
             }
             else
             {
                 var streamPart = new StreamPart(uploadfile.OpenReadStream(), uploadfile.FileName, uploadfile.ContentType);
 
-                await _productAPI.AddProduct(
-                   CreateProductViewModel.ProductNumber,
-                   CreateProductViewModel.Name,
-                   CreateProductViewModel.Color,
-                   CreateProductViewModel.Price,
-                   CreateProductViewModel.Size,
-                   CreateProductViewModel.Weight,
+                await _productAPI.EditProduct(
+                   id,
+                   EditProductViewModel.ProductId,
+                   EditProductViewModel.ProductNumber,
+                   EditProductViewModel.Name,
+                   EditProductViewModel.Color,
+                   EditProductViewModel.Price,
+                   EditProductViewModel.Size,
+                   EditProductViewModel.Weight,
                    $"{Guid.NewGuid()}.{Path.GetExtension(uploadfile.FileName)}",
                    streamPart,
-                   CreateProductViewModel.CategoryId
+                   EditProductViewModel.CategoryId
                );
             }
 
@@ -82,10 +90,10 @@ public class CreateModel : PageModel
     public async Task SetupSelectListProductCategoriesAsync()
     {
         List<SelectListItem>? selectListProductCategories = (await _productCategoryAPI.GetProductCategories()).Select(c => new SelectListItem
-            {
-                Text = c.Name,
-                Value = $"{c.ProductCategoryId}"
-            }).ToList();
+        {
+            Text = c.Name,
+            Value = $"{c.ProductCategoryId}"
+        }).ToList();
 
         selectListProductCategories.Insert(0, new SelectListItem()
         {
@@ -95,5 +103,26 @@ public class CreateModel : PageModel
         });
 
         SelectListProductCategories = selectListProductCategories;
+    }
+
+    private async Task<IActionResult> SetupWidgets(int id)
+    {
+        var product = (await _productAPI.GetProductByID(id)).Adapt<ProductViewModel?>();
+        if (product == null)
+        {
+            return RedirectToPage("Index");
+        }
+
+        EditProductViewModel = MapEditProductViewModel(product);
+        await SetupSelectListProductCategoriesAsync();
+        return RedirectToPage();
+    }
+
+    public EditProductViewModel MapEditProductViewModel(ProductViewModel productViewModel)
+    {
+        TypeAdapterConfig<ProductViewModel, EditProductViewModel>
+               .NewConfig()
+               .Map(dest => dest.CategoryId, src => src.ProductCategory!.ProductCategoryId);
+        return TypeAdapter.Adapt<ProductViewModel, EditProductViewModel>(productViewModel);
     }
 }

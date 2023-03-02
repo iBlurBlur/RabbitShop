@@ -9,6 +9,9 @@ public interface IProductAPI
     [Get(API.PRODUCT_API)]
     Task<IEnumerable<ProductResponseDTO>> GetProducts();
 
+    [Get(API.PRODUCT_API + "/{id}")]
+    Task<ProductResponseDTO> GetProductByID(int id);
+
     [Delete(API.PRODUCT_API + "/{id}")]
     Task DeleteProduct(int id);
 
@@ -28,4 +31,26 @@ public interface IProductAPI
        StreamPart uploadFile,
        int productCategoryId
    );
+
+    [Multipart]
+    [Put(API.PRODUCT_API + "/{id}")]
+    Task EditProduct(
+        int id,
+        int productId,
+        string productNumber,
+        string name,
+        string? color,
+        decimal price,
+        string? size,
+        decimal? weight,
+        string? thumbnailPhotoFileName,
+        StreamPart UploadFile,
+        int productCategoryId
+    );
+
+    [Put(API.PRODUCT_API + "/{id}")]
+    Task EditProduct(
+        int id,
+        [Body(BodySerializationMethod.UrlEncoded)] EditProductDTO editProductDTO
+    );
 }
