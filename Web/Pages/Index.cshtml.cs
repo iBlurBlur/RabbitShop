@@ -14,7 +14,7 @@ namespace Web.Pages
 
         public IActionResult OnGet()
         {
-            return RedirectToPage("Products/Index");
+            return RedirectToPage("Product/Index");
         }
     }
 }

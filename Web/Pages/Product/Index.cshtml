@@ -1,8 +1,37 @@
 ﻿@page
-@model Web.Pages.Products.IndexModel
+@model Web.Pages.Product.IndexModel
 @{
     ViewData["Title"] = "All Products";
 }
+
+<style>
+    .product-img {
+        height: 60px;
+        width: 60px;
+        object-fit: contain;
+    }
+</style>
+
+<h1 class="h2">All Products</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="input-group w-50">
+        <input type="text" class="form-control" placeholder="Search for products">
+        <button class="btn btn-outline-secondary btn-icon" type="button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
+            </svg>
+            Search
+        </button>
+    </div>
+    <div class="btn-toolbar">
+        <a asp-page="./create" role="button" class="btn btn-outline-primary btn-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+                <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+            </svg>
+            Add product
+        </a>
+    </div>
+</div>
 
 <div class=" table-responsive ">
     <table class="table table-striped border align-middle">
@@ -20,7 +49,19 @@
             {
                 <tr>
                     <td>
-                        @product.ProductNumber
+                        <div class="d-flex align-items-center gap-2">
+                            @{
+                                var imgSrc = "/images/no_image.jpg";
+                                if (product.ThumbNailPhoto != null)
+                                {
+                                    var base64 = Convert.ToBase64String(product.ThumbNailPhoto);
+                                    imgSrc = String.Format("data:image/jpg;base64,{0}", base64);
+                                }
+                            }
+                            
+                            <img class="product-img border bg-white" src="@imgSrc">
+                            @product.ProductNumber
+                        </div>
                     </td>
                     <td>
                         @product.Name

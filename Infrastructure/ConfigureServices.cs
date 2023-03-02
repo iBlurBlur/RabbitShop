@@ -12,6 +12,10 @@ public static class ConfigureServices
         services
             .AddRefitClient<IProductAPI>()
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(productAPIURL!));
+
+        services
+          .AddRefitClient<IProductCategoryAPI>()
+          .ConfigureHttpClient(c => c.BaseAddress = new Uri(productAPIURL!));
         return services;
     }
 }

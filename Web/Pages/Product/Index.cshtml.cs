@@ -6,7 +6,7 @@ using Microsoft.VisualBasic;
 using Refit;
 using System.Net;
 
-namespace Web.Pages.Products;
+namespace Web.Pages.Product;
 
 public class IndexModel : PageModel
 {

@@ -11,4 +11,21 @@ public interface IProductAPI
 
     [Delete(API.PRODUCT_API + "/{id}")]
     Task DeleteProduct(int id);
+
+    [Post(API.PRODUCT_API)]
+    Task AddProduct([Body(BodySerializationMethod.UrlEncoded)] CreateProductDTO createProductDTO);
+
+    [Multipart]
+    [Post(API.PRODUCT_API)]
+    Task AddProduct(
+       string productNumber,
+       string name,
+       string? color,
+       decimal price,
+       string? size,
+       decimal? weight,
+       string? thumbnailPhotoFileName,
+       StreamPart uploadFile,
+       int productCategoryId
+   );
 }
