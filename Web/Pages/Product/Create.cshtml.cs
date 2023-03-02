@@ -1,9 +1,11 @@
+using Application.Commom.Constants;
 using Application.Commom.Interfaces;
 using Application.Features.Products.Models;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.VisualBasic;
 using Refit;
 using System.Net;
 using Web.ViewModels;
@@ -64,6 +66,7 @@ public class CreateModel : PageModel
                );
             }
 
+            TempData[Notification.TOAST_SUCCESS_MESSAGE] = "Create successfully";
             return RedirectToPage("Index");
         }
         catch (ApiException exception)
@@ -75,6 +78,7 @@ public class CreateModel : PageModel
                 errorMessage = "Product Invalid";
             }
             await SetupSelectListProductCategoriesAsync();
+            TempData[Notification.TOAST_ERROR_MESSAGE] = errorMessage;
             return Page();
         }
     }

@@ -1,6 +1,6 @@
+using Application.Commom.Constants;
 using Application.Commom.Interfaces;
 using Application.Features.Products.Models;
-using Infrastructure.HttpClient;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -72,6 +72,7 @@ public class EditModel : PageModel
                );
             }
 
+            TempData[Notification.TOAST_SUCCESS_MESSAGE] = "Edit successfully";
             return RedirectToPage("Index");
         }
         catch (ApiException exception)
@@ -83,6 +84,7 @@ public class EditModel : PageModel
                 errorMessage = "Product Invalid";
             }
             await SetupSelectListProductCategoriesAsync();
+            TempData[Notification.TOAST_ERROR_MESSAGE] = errorMessage;
             return Page();
         }
     }

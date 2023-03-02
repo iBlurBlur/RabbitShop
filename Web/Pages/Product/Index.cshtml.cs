@@ -1,3 +1,4 @@
+using Application.Commom.Constants;
 using Application.Commom.Interfaces;
 using Application.Features.Products.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using System.Net;
 
 namespace Web.Pages.Product;
 
+[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 public class IndexModel : PageModel
 {
     private readonly IProductAPI _productAPI;
@@ -25,6 +27,7 @@ public class IndexModel : PageModel
         try
         {
             await _productAPI.DeleteProduct(id);
+            TempData[Notification.TOAST_SUCCESS_MESSAGE] = "Delete successfully";
             return RedirectToPage();
         }
         catch (ApiException exception)
@@ -35,6 +38,7 @@ public class IndexModel : PageModel
             {
                 errorMessage = "Product Not Found";
             }
+            TempData[Notification.TOAST_ERROR_MESSAGE] = errorMessage;
             await GetProducts();
             return Page();
         }

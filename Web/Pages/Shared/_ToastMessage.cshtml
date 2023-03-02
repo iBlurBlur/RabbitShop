@@ -1,0 +1,12 @@
+﻿<script>
+    let sucessMessage = '@TempData[Notification.TOAST_SUCCESS_MESSAGE]'
+    let errorMessage = '@TempData[Notification.TOAST_ERROR_MESSAGE]'
+    if(sucessMessage || errorMessage){
+        let width = '@TempData[Notification.TOAST_WIDTH]';
+        if(errorMessage){
+           showToast(isSuccess = false, errorMessage, width)
+        }else{
+           showToast(isSuccess = true, sucessMessage, width)
+        }
+    }
+</script>
