@@ -1,4 +1,35 @@
-﻿function showToast(isSuccess, message, width) {
+$(document).ready(function () {
+    // Show loading indicator when page is first loaded
+    $("#loadingIndicator").addClass('d-flex');
+
+    // Hide loading indicator when page is fully loaded
+    $(window).on("load", function () {
+        hideLoadingIndicator()
+    });
+
+    // Show loading indicator during AJAX requests
+    $(document).ajaxStart(function () {
+        hideLoadingIndicator()
+    });
+
+    // Hide loading indicator when AJAX requests are finished
+    $(document).ajaxStop(function () {
+        hideLoadingIndicator()
+    });
+});
+
+async function hideLoadingIndicator() {
+   await delay(1000);
+   $("#loadingIndicator").addClass('d-none');
+}
+
+function delay(time) {
+    return new Promise(function (resolve) {
+        setTimeout(resolve, time);
+    });
+}
+
+function showToast(isSuccess, message, width) {
     let toastMessage = message
     let textColor = 'text-danger'
     let backgroundColor = 'rgb(253 232 232)'
