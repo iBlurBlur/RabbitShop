@@ -10,7 +10,7 @@ public interface IProductAPI
     Task<IEnumerable<ProductResponseDTO>> GetProducts();
 
     [Get(API.PRODUCT_API + "/{id}")]
-    Task<ProductResponseDTO> GetProductByID(int id);
+    Task<ProductResponseDTO?> GetProductByID(int id);
 
     [Delete(API.PRODUCT_API + "/{id}")]
     Task DeleteProduct(int id);

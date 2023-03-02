@@ -6,27 +6,30 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.VisualBasic;
 using Refit;
 using System.Net;
+using Web.Interfaces;
+using Web.Services;
+using Web.ViewModels;
 
 namespace Web.Pages.Product;
 
 [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
 public class IndexModel : PageModel
 {
-    private readonly IProductAPI _productAPI;
+    private readonly IProductService _productService;
 
-    public IndexModel(IProductAPI productAPI) => _productAPI = productAPI;
+    public IEnumerable<ProductViewModel> Products { get; set; } = Enumerable.Empty<ProductViewModel>();
 
-    public IEnumerable<ProductResponseDTO> Products { get; set; } = Enumerable.Empty<ProductResponseDTO>();
+    public IndexModel(IProductService productService) => _productService = productService;
 
     public async Task OnGetAsync() => await GetProducts();
 
-    private async Task GetProducts() => Products = await _productAPI.GetProducts();
+    private async Task GetProducts() => Products = await _productService.GetProducts();
 
     public async Task<IActionResult> OnGetDeleteAsync(int id)
     {
         try
         {
-            await _productAPI.DeleteProduct(id);
+            await _productService.DeleteProduct(id);
             TempData[Notification.TOAST_SUCCESS_MESSAGE] = "Delete successfully";
             return RedirectToPage();
         }

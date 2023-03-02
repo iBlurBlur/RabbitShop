@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Refit;
 using System.Net;
+using Web.Interfaces;
+using Web.Services;
 using Web.ViewModels;
 
 namespace Web.Pages.Product;
@@ -17,13 +19,13 @@ public class EditModel : PageModel
     public EditProductViewModel EditProductViewModel { get; set; } = new EditProductViewModel();
     public IEnumerable<SelectListItem>? SelectListProductCategories { get; set; }
 
-    private readonly IProductAPI _productAPI;
-    private readonly IProductCategoryAPI _productCategoryAPI;
+    private readonly IProductService _productService;
+    private readonly IProductCategoryService _productCategoryService;
 
-    public EditModel(IProductAPI productAPI, IProductCategoryAPI productCategoryAPI)
+    public EditModel(IProductService productService, IProductCategoryService productCategoryService)
     {
-        _productAPI = productAPI;
-        _productCategoryAPI = productCategoryAPI;
+        _productService = productService;
+        _productCategoryService = productCategoryService;
     }
 
     public async Task OnGetAsync(int id) => await SetupWidgets(id);
@@ -46,32 +48,7 @@ public class EditModel : PageModel
                 throw new Exception("Product invalid");
             }
 
-            IFormFile? uploadfile = EditProductViewModel.UploadFile;
-
-            if (uploadfile == null)
-            {
-                var EditProductDTO = EditProductViewModel.Adapt<EditProductDTO>();
-                await _productAPI.EditProduct(id, EditProductDTO);
-            }
-            else
-            {
-                var streamPart = new StreamPart(uploadfile.OpenReadStream(), uploadfile.FileName, uploadfile.ContentType);
-
-                await _productAPI.EditProduct(
-                   id,
-                   EditProductViewModel.ProductId,
-                   EditProductViewModel.ProductNumber,
-                   EditProductViewModel.Name,
-                   EditProductViewModel.Color,
-                   EditProductViewModel.Price,
-                   EditProductViewModel.Size,
-                   EditProductViewModel.Weight,
-                   $"{Guid.NewGuid()}.{Path.GetExtension(uploadfile.FileName)}",
-                   streamPart,
-                   EditProductViewModel.CategoryId
-               );
-            }
-
+            await _productService.EditProduct(EditProductViewModel, id);
             TempData[Notification.TOAST_SUCCESS_MESSAGE] = "Edit successfully";
             return RedirectToPage("Index");
         }
@@ -89,42 +66,19 @@ public class EditModel : PageModel
         }
     }
 
-    public async Task SetupSelectListProductCategoriesAsync()
-    {
-        List<SelectListItem>? selectListProductCategories = (await _productCategoryAPI.GetProductCategories()).Select(c => new SelectListItem
-        {
-            Text = c.Name,
-            Value = $"{c.ProductCategoryId}"
-        }).ToList();
-
-        selectListProductCategories.Insert(0, new SelectListItem()
-        {
-            Value = string.Empty,
-            Text = "Pick one",
-            Selected = true
-        });
-
-        SelectListProductCategories = selectListProductCategories;
-    }
+    public async Task SetupSelectListProductCategoriesAsync() =>
+        SelectListProductCategories = await _productCategoryService.GetProductCategories();
 
     private async Task<IActionResult> SetupWidgets(int id)
     {
-        var product = (await _productAPI.GetProductByID(id)).Adapt<ProductViewModel?>();
+        ProductViewModel? product = await _productService.GetProductByID(id);
         if (product == null)
         {
             return RedirectToPage("Index");
         }
 
-        EditProductViewModel = MapEditProductViewModel(product);
+        EditProductViewModel = _productService.MapEditProductViewModel(product);
         await SetupSelectListProductCategoriesAsync();
         return RedirectToPage();
-    }
-
-    public EditProductViewModel MapEditProductViewModel(ProductViewModel productViewModel)
-    {
-        TypeAdapterConfig<ProductViewModel, EditProductViewModel>
-               .NewConfig()
-               .Map(dest => dest.CategoryId, src => src.ProductCategory!.ProductCategoryId);
-        return TypeAdapter.Adapt<ProductViewModel, EditProductViewModel>(productViewModel);
     }
 }

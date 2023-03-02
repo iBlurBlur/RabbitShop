@@ -1,13 +1,12 @@
 using Application.Commom.Constants;
-using Application.Commom.Interfaces;
 using Application.Features.Products.Models;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.VisualBasic;
 using Refit;
 using System.Net;
+using Web.Interfaces;
 using Web.ViewModels;
 
 namespace Web.Pages.Product;
@@ -18,13 +17,13 @@ public class CreateModel : PageModel
     public CreateProductViewModel CreateProductViewModel { get; set; } = new CreateProductViewModel();
     public IEnumerable<SelectListItem>? SelectListProductCategories { get; set; }
 
-    private readonly IProductAPI _productAPI;
-    private readonly IProductCategoryAPI _productCategoryAPI;
+    private readonly IProductService _productService;
+    private readonly IProductCategoryService _productCategoryService;
 
-    public CreateModel(IProductAPI productAPI, IProductCategoryAPI productCategoryAPI)
+    public CreateModel(IProductService productService, IProductCategoryService productCategoryService)
     {
-        _productAPI = productAPI;
-        _productCategoryAPI = productCategoryAPI;
+        _productService = productService;
+        _productCategoryService = productCategoryService;
     }
 
     public async Task OnGetAsync() => await SetupSelectListProductCategoriesAsync();
@@ -42,30 +41,7 @@ public class CreateModel : PageModel
                 throw new Exception(errorMessages);
             }
 
-            IFormFile? uploadfile = CreateProductViewModel.UploadFile;
-
-            if (uploadfile == null)
-            {
-                var createProductDTO = CreateProductViewModel.Adapt<CreateProductDTO>();
-                await _productAPI.AddProduct(createProductDTO);
-            }
-            else
-            {
-                var streamPart = new StreamPart(uploadfile.OpenReadStream(), uploadfile.FileName, uploadfile.ContentType);
-
-                await _productAPI.AddProduct(
-                   CreateProductViewModel.ProductNumber,
-                   CreateProductViewModel.Name,
-                   CreateProductViewModel.Color,
-                   CreateProductViewModel.Price,
-                   CreateProductViewModel.Size,
-                   CreateProductViewModel.Weight,
-                   $"{Guid.NewGuid()}.{Path.GetExtension(uploadfile.FileName)}",
-                   streamPart,
-                   CreateProductViewModel.CategoryId
-               );
-            }
-
+            await _productService.CreateProduct(CreateProductViewModel);
             TempData[Notification.TOAST_SUCCESS_MESSAGE] = "Create successfully";
             return RedirectToPage("Index");
         }
@@ -83,21 +59,6 @@ public class CreateModel : PageModel
         }
     }
 
-    public async Task SetupSelectListProductCategoriesAsync()
-    {
-        List<SelectListItem>? selectListProductCategories = (await _productCategoryAPI.GetProductCategories()).Select(c => new SelectListItem
-            {
-                Text = c.Name,
-                Value = $"{c.ProductCategoryId}"
-            }).ToList();
-
-        selectListProductCategories.Insert(0, new SelectListItem()
-        {
-            Value = string.Empty,
-            Text = "Pick one",
-            Selected = true
-        });
-
-        SelectListProductCategories = selectListProductCategories;
-    }
+    public async Task SetupSelectListProductCategoriesAsync() => 
+        SelectListProductCategories = await _productCategoryService.GetProductCategories();
 }
