@@ -1,5 +1,4 @@
 ﻿using Application.Commom.Interfaces;
-using Infrastructure.HttpClient;
 using Microsoft.Extensions.Configuration;
 using Refit;
 
