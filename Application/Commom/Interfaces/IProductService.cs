@@ -1,16 +1,16 @@
-﻿using Application.Features.Products.Models;
+﻿using Domain.Entities;
 
 namespace Application.Commom.Interfaces;
 
-public interface IProductAPI
+public interface IProductService
 {
-    Task<IEnumerable<ProductResponseDTO>> GetProducts();
+    Task<IEnumerable<Product>> GetProducts();
 
-    Task<ProductResponseDTO?> GetProductByID(int id);
+    Task<Product?> GetProductByID(int id);
 
     Task DeleteProduct(int id);
 
-    Task AddProduct(CreateProductDTO createProductDTO);
+    Task AddProduct(Product product);
 
     Task AddProduct(
         string productNumber,
@@ -24,7 +24,7 @@ public interface IProductAPI
         int productCategoryId
     );
 
-    Task EditProduct( int id, EditProductDTO editProductDTO);
+    Task EditProduct(int id, Product product);
 
     Task EditProduct(
         int id,

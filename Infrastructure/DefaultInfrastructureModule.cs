@@ -1,4 +1,6 @@
-﻿using Autofac;
+﻿using Application.Commom.Interfaces;
+using Application.Features.Products;
+using Autofac;
 using System.Reflection;
 using Module = Autofac.Module;
 
@@ -13,5 +15,9 @@ public class DefaultInfrastructureModule : Module
           .Where(t => t.Name.EndsWith("API"))
           .AsImplementedInterfaces()
           .InstancePerLifetimeScope();
+
+        builder.RegisterType<ProductService>()
+              .As<IProductService>()
+              .InstancePerLifetimeScope();
     }
 }

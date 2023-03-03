@@ -1,17 +1,25 @@
-﻿using Application.Commom.Interfaces;
-using Application.Features.Products.Models;
+﻿using Application.Features.Products.Models;
 using Mapster;
-using Refit;
-using Web.Interfaces;
+using Application.Commom.Interfaces;
+
+using IProductService = Web.Interfaces.IProductService;
+using IProductServiceApplication = Application.Commom.Interfaces.IProductService;
+
 using Web.ViewModels;
+using Domain.Entities;
 
 namespace Web.Services;
 
 public class ProductService : IProductService
 {
     private readonly IProductAPI _productAPI;
+    private readonly IProductServiceApplication _productServiceApplication;
 
-    public ProductService(IProductAPI productAPI) => _productAPI = productAPI;
+    public ProductService(IProductAPI productAPI, IProductServiceApplication productServiceApplication)
+    {
+        _productAPI = productAPI;
+        _productServiceApplication = productServiceApplication;
+    }
 
     public async Task<IEnumerable<ProductViewModel>> GetProducts() =>
         (await _productAPI.GetProducts())
@@ -29,6 +37,10 @@ public class ProductService : IProductService
         {
             var createProductDTO = createProductViewModel.Adapt<CreateProductDTO>();
             await _productAPI.AddProduct(createProductDTO);
+
+            //var product = createProductViewModel.Adapt<Product>();
+            //product.SetNameEdition(createProductViewModel.Color!);
+            //await _productServiceApplication.AddProduct(product);
             return;
         }
 
@@ -53,6 +65,10 @@ public class ProductService : IProductService
         {
             var EditProductDTO = editProductViewModel.Adapt<EditProductDTO>();
             await _productAPI.EditProduct(id, EditProductDTO);
+
+            var product = editProductViewModel.Adapt<Product>();
+            product.SetNameEdition(editProductViewModel.Color!);
+            await _productServiceApplication.EditProduct(id, product);
             return;
         }
       
@@ -82,5 +98,3 @@ public class ProductService : IProductService
         return TypeAdapter.Adapt<ProductViewModel, EditProductViewModel>(productViewModel);
     }
 }
-
-

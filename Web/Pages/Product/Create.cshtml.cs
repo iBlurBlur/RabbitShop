@@ -1,6 +1,4 @@
 using Application.Commom.Constants;
-using Application.Features.Products.Models;
-using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;

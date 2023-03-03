@@ -1,14 +1,10 @@
 using Application.Commom.Constants;
-using Application.Commom.Interfaces;
-using Application.Features.Products.Models;
-using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Refit;
 using System.Net;
 using Web.Interfaces;
-using Web.Services;
 using Web.ViewModels;
 
 namespace Web.Pages.Product;
