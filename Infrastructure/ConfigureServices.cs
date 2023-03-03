@@ -1,4 +1,4 @@
-﻿using Application.Commom.Interfaces;
+﻿using Infrastructure.HttpClient;
 using Microsoft.Extensions.Configuration;
 using Refit;
 
@@ -10,11 +10,11 @@ public static class ConfigureServices
     {
         var productAPIURL = configuration.GetValue<string>("ProductEndpoint");
         services
-            .AddRefitClient<IProductAPI>()
+            .AddRefitClient<IProductAPIClient>()
             .ConfigureHttpClient(c => c.BaseAddress = new Uri(productAPIURL!));
 
         services
-          .AddRefitClient<IProductCategoryAPI>()
+          .AddRefitClient<IProductCategoryAPIClient>()
           .ConfigureHttpClient(c => c.BaseAddress = new Uri(productAPIURL!));
         return services;
     }

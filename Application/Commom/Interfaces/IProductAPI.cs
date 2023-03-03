@@ -1,56 +1,47 @@
-﻿using Application.Commom.Constants;
-using Application.Features.Products.Models;
-using Refit;
+﻿using Application.Features.Products.Models;
 
 namespace Application.Commom.Interfaces;
 
 public interface IProductAPI
 {
-    [Get(API.PRODUCT_API)]
     Task<IEnumerable<ProductResponseDTO>> GetProducts();
 
-    [Get(API.PRODUCT_API + "/{id}")]
     Task<ProductResponseDTO?> GetProductByID(int id);
 
-    [Delete(API.PRODUCT_API + "/{id}")]
     Task DeleteProduct(int id);
 
-    [Post(API.PRODUCT_API)]
-    Task AddProduct([Body(BodySerializationMethod.UrlEncoded)] CreateProductDTO createProductDTO);
+    Task AddProduct(CreateProductDTO createProductDTO);
 
-    [Multipart]
-    [Post(API.PRODUCT_API)]
     Task AddProduct(
-       string productNumber,
-       string name,
-       string? color,
-       decimal price,
-       string? size,
-       decimal? weight,
-       string? thumbnailPhotoFileName,
-       StreamPart uploadFile,
-       int productCategoryId
-   );
+        string productNumber,
+        string name,
+        string color,
+        decimal price,
+        string size,
+        decimal? weight,
+        string thumbnailPhotoFileName,
+        Stream uploadFile,
+        int productCategoryId
+    );
 
-    [Multipart]
-    [Put(API.PRODUCT_API + "/{id}")]
+    Task EditProduct( int id, EditProductDTO editProductDTO);
+
     Task EditProduct(
         int id,
         int productId,
         string productNumber,
         string name,
-        string? color,
+        string color,
         decimal price,
-        string? size,
+        string size,
         decimal? weight,
-        string? thumbnailPhotoFileName,
-        StreamPart UploadFile,
+        string thumbnailPhotoFileName,
+        Stream uploadFile,
         int productCategoryId
     );
-
-    [Put(API.PRODUCT_API + "/{id}")]
-    Task EditProduct(
-        int id,
-        [Body(BodySerializationMethod.UrlEncoded)] EditProductDTO editProductDTO
-    );
 }
+
+
+
+
+

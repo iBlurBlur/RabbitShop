@@ -1,5 +1,6 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Infrastructure;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,8 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
+    containerBuilder.RegisterModule(new DefaultInfrastructureModule());
+
     containerBuilder.RegisterAssemblyTypes(Assembly.GetExecutingAssembly())
                     .Where(t => t.Name.EndsWith("Service"))
                     .AsImplementedInterfaces();

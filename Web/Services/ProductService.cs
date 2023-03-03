@@ -32,16 +32,15 @@ public class ProductService : IProductService
             return;
         }
 
-        var streamPart = new StreamPart(uploadfile.OpenReadStream(), uploadfile.FileName, uploadfile.ContentType);
         await _productAPI.AddProduct(
            createProductViewModel.ProductNumber,
            createProductViewModel.Name,
-           createProductViewModel.Color,
+           createProductViewModel.Color!,
            createProductViewModel.Price,
-           createProductViewModel.Size,
+           createProductViewModel.Size!,
            createProductViewModel.Weight,
            $"{Guid.NewGuid()}.{Path.GetExtension(uploadfile.FileName)}",
-           streamPart,
+           uploadfile.OpenReadStream(),
            createProductViewModel.CategoryId
        );
     }
@@ -56,19 +55,18 @@ public class ProductService : IProductService
             await _productAPI.EditProduct(id, EditProductDTO);
             return;
         }
-        var streamPart = new StreamPart(uploadfile.OpenReadStream(), uploadfile.FileName, uploadfile.ContentType);
-
+      
         await _productAPI.EditProduct(
            id,
            editProductViewModel.ProductId,
            editProductViewModel.ProductNumber,
            editProductViewModel.Name,
-           editProductViewModel.Color,
+           editProductViewModel.Color!,
            editProductViewModel.Price,
-           editProductViewModel.Size,
+           editProductViewModel.Size!,
            editProductViewModel.Weight,
            $"{Guid.NewGuid()}.{Path.GetExtension(uploadfile.FileName)}",
-           streamPart,
+           uploadfile.OpenReadStream(),
            editProductViewModel.CategoryId
        );
     }

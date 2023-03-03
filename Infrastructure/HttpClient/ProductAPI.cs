@@ -6,21 +6,21 @@ namespace Infrastructure.HttpClient;
 
 public class ProductAPI : IProductAPI
 {
-    private readonly IProductAPI _productAPI;
+    private readonly IProductAPIClient _productAPIClient;
 
-    public ProductAPI(IProductAPI productAPI) => _productAPI = productAPI;
+    public ProductAPI(IProductAPIClient productAPIClient) => _productAPIClient = productAPIClient;
 
     public async Task<IEnumerable<ProductResponseDTO>> GetProducts() =>
-        await _productAPI.GetProducts();
+        await _productAPIClient.GetProducts();
 
-    public async Task<ProductResponseDTO> GetProductByID(int id) => 
-        await _productAPI.GetProductByID(id);
+    public async Task<ProductResponseDTO?> GetProductByID(int id) => 
+        await _productAPIClient.GetProductByID(id);
 
     public async Task DeleteProduct(int id) =>
-        await _productAPI.DeleteProduct(id);
+        await _productAPIClient.DeleteProduct(id);
 
-    public async Task AddProduct(string productNumber, string name, string? color, decimal price, string? size, decimal? weight, string? thumbnailPhotoFileName, StreamPart uploadFile, int productCategoryId) =>
-        await _productAPI.AddProduct(
+    public async Task AddProduct(string productNumber, string name, string color, decimal price, string size, decimal? weight, string thumbnailPhotoFileName, Stream uploadFile, int productCategoryId) =>
+        await _productAPIClient.AddProduct(
             productNumber,
             name,
             color,
@@ -28,28 +28,28 @@ public class ProductAPI : IProductAPI
             size,
             weight,
             thumbnailPhotoFileName,
-            uploadFile,
+            new StreamPart(uploadFile, thumbnailPhotoFileName),
             productCategoryId
         );
 
     public async Task AddProduct([Body(BodySerializationMethod.UrlEncoded)] CreateProductDTO createProductDTO) =>
-        await _productAPI.AddProduct(createProductDTO);
-
-    public async Task EditProduct(int id, int productId, string productNumber, string name, string? color, decimal price, string? size, decimal? weight, string? thumbnailPhotoFileName, StreamPart uploadFile, int productCategoryId) => 
-        await _productAPI.EditProduct(
-            id,
-            productId,
-            productNumber,
-            name,
-            color,
-            price,
-            size,
-            weight,
-            thumbnailPhotoFileName,
-            uploadFile,
-            productCategoryId
-        );
+        await _productAPIClient.AddProduct(createProductDTO);
 
     public async Task EditProduct(int id, [Body(BodySerializationMethod.UrlEncoded)] EditProductDTO editProductDTO) =>
-          await _productAPI.EditProduct(id, editProductDTO);
+          await _productAPIClient.EditProduct(id, editProductDTO);
+
+    public async Task EditProduct(int id, int productId, string productNumber, string name, string color, decimal price, string size, decimal? weight, string thumbnailPhotoFileName, Stream uploadFile, int productCategoryId) =>
+     await _productAPIClient.EditProduct(
+         id,
+         productId,
+         productNumber,
+         name,
+         color,
+         price,
+         size,
+         weight,
+         thumbnailPhotoFileName,
+         new StreamPart(uploadFile, thumbnailPhotoFileName),
+         productCategoryId
+     );
 }

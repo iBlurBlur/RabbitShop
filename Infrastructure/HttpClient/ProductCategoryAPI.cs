@@ -5,9 +5,9 @@ namespace Infrastructure.HttpClient;
 
 public class ProductCategoryAPI : IProductCategoryAPI
 {
-    private readonly IProductCategoryAPI _productCategoryAPI;
+    private readonly IProductCategoryAPIClient IProductCategoryAPIClient;
 
-    public ProductCategoryAPI(IProductCategoryAPI productCategoryAPI) => _productCategoryAPI = productCategoryAPI;
+    public ProductCategoryAPI(IProductCategoryAPIClient productCategoryAPIClient) => IProductCategoryAPIClient = productCategoryAPIClient;
 
-    public async Task<IEnumerable<ProductCategoryDTO>> GetProductCategories() => await _productCategoryAPI.GetProductCategories();
+    public async Task<IEnumerable<ProductCategoryDTO>> GetProductCategories() => await IProductCategoryAPIClient.GetProductCategories();
 }
